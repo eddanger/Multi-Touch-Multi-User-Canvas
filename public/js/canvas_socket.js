@@ -2,13 +2,15 @@ var body, canvas, ctx, socket, coords, last_coords, touchdown;
 
 $(document).ready(function() {
 	setup_canvas();
+	happyFace();
 	setup_socket();
 	setup_ios();
 });
 
 function setup_socket() {
 	socket = new io.Socket(null, { 
-		port: 8080
+		port: 8080,
+		rememberTransport: false
 	});
 
 	socket.connect();
@@ -25,21 +27,21 @@ function setup_socket() {
 
 	receive_coordinates = function(message) {
 		coords = message.c;
-
+		
 		for (var i = 0; i < coords.length; i++)
 		{
-			current_coords = {
+			current_socket_coords = {
 				x:coords[i].current.x,
 				y:coords[i].current.y,
 			};
 
-			last_coords = {
+			last_socket_coords = {
 				x:coords[i].last.x,
 				y:coords[i].last.y,
 			};
 
-			drawLine("pink", current_coords, last_coords);
-			drawCircle("orange", current_coords);
+			drawLine("#FF00FF", current_socket_coords, last_socket_coords);
+			drawCircle("#FF8040", current_socket_coords);
 		}
 	};
 
@@ -72,7 +74,7 @@ function setup_canvas()
 	body = document.querySelector("body");
 	canvas = document.querySelector('canvas');
 	ctx = canvas.getContext('2d');
-
+	
 	// iOS
 	canvas.ontouchmove = function(e) {
 		coords = [];
@@ -115,12 +117,13 @@ function setup_canvas()
 	
 	// typical draw evemt for desktop 
 	canvas.onmousemove = function(e) {
+	
 		if (touchdown) {
 			if (!last_coords)
 			{
 				last_coords = [];
 			}
-			
+
 			var current_coords = {
 				x:e.clientX - e.target.offsetLeft + window.scrollX,
 				y:e.clientY - e.target.offsetTop + window.scrollY
@@ -131,6 +134,8 @@ function setup_canvas()
 				last: last_coords
 			}];
 			
+			//$('.debug').html('coords: ' + current_coords.x + " " + current_coords.y );
+			
 			move(coords);
 
 			last_coords = current_coords;
@@ -139,13 +144,15 @@ function setup_canvas()
 	
 	canvas.onmouseup = function(e) {
  		last_coords = null;
+		//$('.debug').html('');
 	};
 
-	window.onmouseup = function(e) {
+	body.onmouseup = function(e) {
 		touchdown = false;
+		last_coords = null;
 	};
 		
-	window.onmousedown = function(e) {
+	body.onmousedown = function(e) {
 		touchdown = true;
 	};
 
@@ -156,7 +163,10 @@ function drawLine(color, coords, last_coords)
 	ctx.strokeStyle = color;
 	ctx.beginPath();
 	ctx.moveTo(coords.x,coords.y);
-	ctx.lineTo(last_coords.x,last_coords.y);
+	if (last_coords.x)
+	{
+		ctx.lineTo(last_coords.x,last_coords.y);
+	}
 	ctx.closePath();
 	ctx.stroke();
 }
@@ -167,8 +177,8 @@ function drawCircle(color, coords)
 	ctx.beginPath();
 	ctx.moveTo(coords.x,coords.y);
 	ctx.arc(coords.x, coords.y, 3, 0,  Math.PI*2, true);
-	ctx.fill();
 	ctx.closePath();
+	ctx.fill();
 }
 
 function send(coords)
@@ -180,19 +190,68 @@ function move(coords)
 {
 	for (var i = 0; i < coords.length; i++)
 	{
-		current_coords = {
+		var current_coords = {
 			x:coords[i].current.x,
 			y:coords[i].current.y,
 		};
 
-		last_coords = {
+		var last_coords = {
 			x:coords[i].last.x,
 			y:coords[i].last.y,
 		};
 
-		drawLine("blue", current_coords, last_coords);
-		drawCircle("red", current_coords);
+		drawLine("#0000ff", current_coords, last_coords);
+		drawCircle("#ff0000", current_coords);
 	}
 
 	send(coords);
+}
+
+function happyFace()
+{
+	ctx.strokeStyle = "#000000";
+	ctx.fillStyle = "#FFFF00";
+	ctx.beginPath();
+	ctx.arc(100,100,50,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.stroke();
+	ctx.fill();
+
+	// Add 2 green eyes					
+	ctx.strokeStyle = "#000000";
+	ctx.fillStyle = "#FFFFFF";
+	ctx.beginPath();
+	ctx.arc(80,80,8,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.stroke();
+	ctx.fill();
+
+	ctx.fillStyle = "#009966";
+	ctx.beginPath();
+	ctx.arc(80,80,5,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fill();
+	
+	ctx.strokeStyle = "#000000";
+	ctx.fillStyle = "#FFFFFF";
+	ctx.beginPath();
+	ctx.arc(120,80,8,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.stroke();
+	ctx.fill();
+	
+	ctx.fillStyle = "#009966";
+	ctx.beginPath();
+	ctx.arc(120,80,5,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fill();
+
+	// Add the smile					
+	ctx.strokeStyle = "#000000";
+	ctx.beginPath();
+	ctx.moveTo(70,110);
+	ctx.quadraticCurveTo(100,150,130,110);
+	ctx.quadraticCurveTo(100,150,70,110);				
+	ctx.closePath();
+	ctx.stroke();
 }

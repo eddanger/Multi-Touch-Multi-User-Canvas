@@ -9,13 +9,16 @@ html
     
     meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1")
 
-
-    link(rel="stylesheet", href="/css/style.css")
-  body
-    
-    != body
-    
+    <!--[if IE]><script type="text/javascript" src="/js/excanvas.js"></script><![endif]-->
     script(src='/socket.io/socket.io.js')
     script(src='/js/jquery-1.5.1.min.js')
     script(src='/js/json.js')
     script(src='/js/canvas_socket.js')
+    
+
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    
+    .debug
+    
+    != body
