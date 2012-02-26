@@ -2,8 +2,8 @@
   "name":"multi_touch_multi_user_canvas",
   "version":"0.0.42",
   "dependencies": {
-    "express":"2.0.0beta2",
-    "jade":"0.8.5",
-    "socket.io":"0.6.16"
+    "express":"2.5.8",
+    "jade":"0.20.3",
+    "socket.io":"0.8.7"
   }
 }
